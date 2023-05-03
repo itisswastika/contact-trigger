@@ -1,0 +1,35 @@
+public class contactTriggerHandler {
+
+public static void contactRollupOnAccount(List<Contact> contacts){
+        
+        Set<Id> parentAccountId = new Set<Id>();
+        for(Contact c: contacts){
+            if(c.AccountId <> null){
+            parentAccountId.add(c.AccountId);
+            }
+        }
+       
+       List<Account> accountDetails = [Select Id, No_Of_Contacts__c from Account where Id in : parentAccountId];
+      
+       Map<Id,Integer> accountToContactMap = new Map<Id,Integer>();
+       
+       List<Contact> contactCount = new List<Contact>(); 
+        
+        for(Id accId : parentAccountId){
+            contactCount.clear();
+        	for(Contact c: contacts) {  
+                if(accId == c.AccountId){
+                    contactCount.add(c);
+                }
+            }
+            accountToContactMap.put(accId,contactCount.size());
+        }
+        
+        for(Account a : accountDetails){
+		a.No_Of_Contacts__c = accountToContactMap.get(a.Id);
+        }
+ 
+     update accountDetails;   
+    }
+}
+    
